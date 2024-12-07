@@ -141,4 +141,5 @@ export {
     createUser,
     loginUser,
     logoutUser,
+    generateAccessTokenandRefreshToken,
 }
