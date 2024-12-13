@@ -3,9 +3,9 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Comment } from "../models/comment.model.js";
 import { isValidObjectId } from "mongoose";
-import { Like } from "../models/like.model.js"
 
-export const getAllCommentsOfBlog = asyncHandler(async (req, res) => {
+
+ const getAllCommentsOfBlog = asyncHandler(async (req, res) => {
     try {
         const { blogId } = req.params;
 
@@ -77,36 +77,10 @@ export const getAllCommentsOfBlog = asyncHandler(async (req, res) => {
 });
 
 
-export const getTotalLikesOfComment = asyncHandler(async (req, res) => {
-    try {
-        const { commentId } = req.params;
-
-        const isValidCommentId = isValidObjectId(commentId)
-
-        if (!isValidCommentId) {
-            throw new ApiError('CommentId is not Valid');
-        }
-
-        const totalLikesinComment = await Like.find({ commentId: commentId }).count();
-
-        return res
-            .status(200)
-            .json(
-                new ApiResponse(totalLikesinComment, 'get successfully total likes of comment', 200)
-            )
 
 
-    } catch (error) {
-        return res
-            .status(500)
-            .json(
-                new ApiResponse({}, error.message || 'internal server problem', 500)
-            )
-    }
-})
 
-
-export const postComment = asyncHandler(async(req,res)=>{
+ const postComment = asyncHandler(async(req,res)=>{
      try {
          const {content} = req.body;
          
@@ -144,7 +118,7 @@ export const postComment = asyncHandler(async(req,res)=>{
      }
 })
 
-export const updateComment = asyncHandler(async(req,res)=>{
+ const updateComment = asyncHandler(async(req,res)=>{
     try {
         const {content} = req.body;
         const {commentId} = req.params;
@@ -193,7 +167,7 @@ export const updateComment = asyncHandler(async(req,res)=>{
     }
 })
 
-export const deleteComment = asyncHandler(async(req,res)=>{
+ const deleteComment = asyncHandler(async(req,res)=>{
      try {
         const {commentId} = req.params;
    
@@ -203,11 +177,12 @@ export const deleteComment = asyncHandler(async(req,res)=>{
    
         const comment = await Comment.findOne({_id:commentId})
 
-        if(comment.owner !== req.user?._id){
+        if(comment.owner.toString() !== req.user?._id){
            throw new ApiError('you are not authorized user for delete this comment',401)
         }
    
-        const deletedComment = await Comment.findByIdAndDelete(commentId)
+        const deletedComment = await Comment.findByIdAndDelete(commentId);
+        
         if(!deletedComment){
            throw new ApiError('comment does not exist',404 )
         }
@@ -228,3 +203,153 @@ export const deleteComment = asyncHandler(async(req,res)=>{
 
 
 })
+
+
+const addReplyCommentsInMainComment = asyncHandler(async(req,res)=>{
+    try {
+        const {commentId,replyCommentId} = req.params;
+
+        if(!isValidObjectId(commentId)){
+            throw new ApiError('commentId is not valid',401)
+        }
+
+        if(!isValidObjectId(replyCommentId)){
+            throw new ApiError('replyCommentId is not valid',401)
+        }
+
+       const addedRepliedComment = await Comment.findByIdAndUpdate(
+            commentId,
+            {
+                $push:{
+                    replyComments:replyCommentId 
+                }
+            },
+            {
+                new :true
+            }
+        )
+
+        return res
+        .status(200)
+        .json(
+            new ApiResponse(addedRepliedComment,'add replied comment successfully in main Comment',200)
+        )
+        
+        
+        
+    } catch (error) {
+        
+        return res
+        .status(500)
+        .json(
+            new ApiResponse({},error.message || 'internal server problem while add replied comment  in main Comment',500)
+        )
+    }
+})
+
+
+const deleteRepliedCommentInMainComment = asyncHandler(async(req,res)=>{
+    try {
+        const {commentId,replyCommentId} = req.params;
+
+        if(!isValidObjectId(commentId)){
+            throw new ApiError('commentId is not valid',401)
+        }
+
+        if(!isValidObjectId(replyCommentId)){
+            throw new ApiError('replyCommentId is not valid')
+        }
+
+        const removeRepliedCommentInMainComment = await Comment.findByIdAndUpdate(
+            commentId,
+            {
+                $pull:{
+                   replyComments:replyCommentId 
+                }
+            },
+            {
+                new:true
+            }
+        )
+
+        return res
+        .status(200)
+        .json(
+            new ApiResponse(removeRepliedCommentInMainComment,'remove replied comment successfully in main Comment',200)
+        )
+        
+        
+        
+    } catch (error) {
+        return res
+        .status(200)
+        .json(
+            new ApiResponse({},'remove replied comment successfully in main Comment',200)
+        )
+        
+    }
+})
+
+const getAllRepliedCommentInMainComment = asyncHandler(async(req,res)=>{
+
+    try {
+        const {commentId} = req.params;
+    
+        if(!isValidObjectId(commentId)){
+            throw new ApiError("commentId is not valid")
+        }
+    
+        const allrepliedComments = await Comment.aggregate([
+            {
+                $match:{
+                    _id:new mongoose.Types.ObjectId(commentId),
+                }
+            },
+            {
+                $lookup:{
+                    from:"replycomments",
+                    localField:"replyComments",
+                    foreignField:"_id",
+                    as:"replyComments",
+                    pipeline:[
+                        {
+                            $lookup:{
+                                from:"users",
+                                localField:"replyBy",
+                                foreignField:"_id",
+                                as:"replyBy"
+                            }
+                        },
+                    ]
+                }
+            },
+        ])
+    
+        return res
+        .status(200)
+        .json(
+            new ApiResponse(allrepliedComments,'get all replied comment successfully',200)
+        )
+    } catch (error) {
+        return res
+        .status(500)
+        .json(
+            new ApiResponse({},error.message || 'internal server problem while get all replied comments in main comment',500)
+        )
+    }
+
+    
+
+})
+
+
+
+export {
+    addReplyCommentsInMainComment,
+    deleteRepliedCommentInMainComment,
+    postComment,
+    getAllCommentsOfBlog,
+    updateComment,
+    deleteComment,
+    getAllRepliedCommentInMainComment,
+}

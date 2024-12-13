@@ -52,7 +52,7 @@ const generateAccessTokenandRefreshToken = async (userId) => {
         const accessToken = user.generateAccessToken()
         const refreshToken = user.generateRefreshToken()
         user.refreshToken = refreshToken;
-        await User.save({ validateBeforeSave: false })
+        await user.save({ validateBeforeSave: false })
         return { accessToken, refreshToken }
     } catch (error) {
         return res
@@ -108,7 +108,7 @@ const loginUser = asyncHandler(async (req, res) => {
         return res
             .status(500)
             .json(
-                new A
+                new ApiResponse({}, error.message || "internal server problem", 500)
             )
     }
 
@@ -141,5 +141,4 @@ export {
     createUser,
     loginUser,
     logoutUser,
-    generateAccessTokenandRefreshToken,
 }

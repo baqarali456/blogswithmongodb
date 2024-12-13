@@ -93,7 +93,7 @@ const deleteBlog = asyncHandler(async (req, res) => {
 
     const blog = await Blog.findOne({ _id: blogId });
 
-    if (blog.createdBy !== req.user?._id) {
+    if (blog.createdBy.toString() !== req.user?._id) {
         throw new ApiError('you are not authorized user to delete the blog')
     }
 
@@ -123,34 +123,6 @@ const userGetAllBlogs = asyncHandler(async (req, res) => {
         const blogsaggregate = await Blog.aggregate([
             {
                 $match: {},
-            },
-            {
-                $lookup: {
-                    from: 'likes',
-                    localField: '_id',
-                    foreignField: 'BlogId',
-                    as: 'AllBlogs',
-                    pipeline: [
-                        {
-                            $match: {
-                                $expr: { $ne: ['commentId', null] }
-                            }
-                        },
-                    ]
-                }
-            },
-            {
-                $addFields: {
-                    totalLikesinBlog: {
-                        $size: '$AllBlogs'
-                    },
-                    isLikedBlog: {
-                        $cond: {
-
-                        }
-
-                    }
-                }
             },
             {
                 $project: {

@@ -14,7 +14,14 @@ const commentSchema = new mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:'User'
         
-    }
+    },
+    replyComments:[
+        {
+            type:mongoose.Schema.Types.ObjectId,
+            ref:"ReplyComment",
+        },
+    ],
+
 },{timestamps:true})
 
 commentSchema.plugin(mongooseAggregatePaginate);

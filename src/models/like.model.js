@@ -4,15 +4,19 @@ const likeSchema = new mongoose.Schema(
   {
     likedBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // Baqar
+      ref: "User", 
     },
     commentId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Comment", // null
+      ref: "Comment", 
     },
     BlogId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Blog",
+    },
+    replyCommentId:{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ReplyComment",
     },
     likeType: {
       type: String,
