@@ -13,8 +13,11 @@ const replyCommentRouter = Router();
 replyCommentRouter.use(verifyJWT);
 
 replyCommentRouter.route('/replyonComments/:commentId').post(replyonComments)
+
 replyCommentRouter.route('/updateRepliedComment/:replyCommentId').patch(updateRepliedComment)
-replyCommentRouter.route('/deleteRepliedComment/:replyCommentId').post(deleteRepliedComment)
+
+replyCommentRouter.route('/deleteRepliedComment/:replyCommentId').delete(deleteRepliedComment)
+
 replyCommentRouter.route('/getAllRepliedCommentsOfSingleComment/:commentId').post(getAllRepliedCommentsOfSingleComment)
 
 export {
