@@ -1,7 +1,8 @@
-import {isValidObjectId} from "mongoose";
+import mongoose, {isValidObjectId} from "mongoose";
 import {ApiError} from "../utils/ApiError.js";
 import {ApiResponse} from "../utils/ApiResponse.js"
 import {ReplyComment} from "../models/replyComments.model.js"
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 
 
@@ -24,7 +25,7 @@ const replyonComments = asyncHandler(async(req,res)=>{
         const repliedComment = await ReplyComment.create({
             content,
             replyBy:req.user._id,
-            
+            commentId,
         })
 
         
@@ -137,11 +138,72 @@ const deleteRepliedComment = asyncHandler(async(req,res)=>{
     }
 })
 
+const getAllRepliedCommentsOfSingleComment = asyncHandler(async(req,res)=>{
+    try {
+        const {commentId} = req.params;
+        const {page = 1,limit= 5} = req.query;
+
+        if(!isValidObjectId(commentId)){
+            throw new ApiError('comment Id is not valid',401);
+        }
+
+       const allRepliedComments = await ReplyComment.aggregate([
+            {
+                $match:{
+                    commentId:new mongoose.Types.ObjectId(commentId)
+                }
+            },
+            {
+                $lookup:{
+                    from:'users',
+                    localField:'replyBy',
+                    foreignField:'_id',
+                    as:'replyBy',
+                     pipeline:[
+                        {
+                            $project:{
+                                username:1,
+                            }
+                        }
+                    ]
+                }
+            },
+        ])
+
+
+      const paginatedRepliedCommentsofSingleComment =  await ReplyComment.aggregatePaginate(allRepliedComments,{
+             page:parseInt(page),
+             limit:parseInt(limit),
+             pagination:true,
+             customLabels:{
+                totalDocs:"allRepliedComments",
+                totalPages:"pagesof_RepliedComments",
+                
+             }
+        })
+
+        return res
+        .status(200)
+        .json(
+            new ApiResponse(paginatedRepliedCommentsofSingleComment,'get sucessfully replied comments of a single comment',200)
+        )
+        
+    } catch (error) {
+        return res
+        .status(500)
+        .json(
+            new ApiResponse({},error.message || 'internal server problem while get  replied comments of a single comment',500)
+        )
+        
+    }
+})
+
 
 
 
 export {
     replyonComments,
     updateRepliedComment,
-    deleteRepliedComment
+    deleteRepliedComment,
+    getAllRepliedCommentsOfSingleComment,
 }

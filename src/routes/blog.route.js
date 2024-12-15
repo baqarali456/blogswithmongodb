@@ -8,9 +8,13 @@ import { verifyJWT } from "../middlewares/auth.middleware.js"
 
 const blogRouter = Router();
 
-blogRouter.route('/create-blog').post(verifyJWT, createBlog)
-blogRouter.route('/update-blog/:blogId').patch(verifyJWT, updateBlog)
-blogRouter.route('/delete-blog/:blogId').delete(verifyJWT, deleteBlog)
+blogRouter.use(verifyJWT);
+
+blogRouter.route('/create-blog').post(createBlog)
+blogRouter.route('/update-blog/:blogId').patch(updateBlog)
+blogRouter.route('/delete-blog/:blogId').delete(deleteBlog)
+
+blogRouter.route('/getAllBlogs').get(userGetAllBlogs)
 
 
 export { blogRouter }

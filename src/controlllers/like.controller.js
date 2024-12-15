@@ -4,7 +4,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { isValidObjectId } from "mongoose";
 import { Like } from "../models/like.model.js";
 
-export const userLikeonBlog = asyncHandler(async(req,res)=>{
+ const userLikeonBlog = asyncHandler(async(req,res)=>{
     try {
         const {blogId} = req.params;
 
@@ -42,7 +42,7 @@ export const userLikeonBlog = asyncHandler(async(req,res)=>{
     }
 })
 
-export const userLikeonComment = asyncHandler(async(req,res)=>{
+ const userLikeonComment = asyncHandler(async(req,res)=>{
     try {
         const {commentId} = req.params;
         
@@ -78,7 +78,7 @@ export const userLikeonComment = asyncHandler(async(req,res)=>{
     }
 })
 
-export const updateLikeType = asyncHandler(async(req,res)=>{
+ const updateLikeType = asyncHandler(async(req,res)=>{
     try {
         const {likeType="👍"} = req.body;
         const {likeId} = req.params;
@@ -121,7 +121,7 @@ export const updateLikeType = asyncHandler(async(req,res)=>{
     }
 })
 
-export const deleteLike = asyncHandler(async(req,res)=>{
+ const deleteLike = asyncHandler(async(req,res)=>{
     try {
         
         const {likeId} = req.params;
@@ -135,7 +135,7 @@ export const deleteLike = asyncHandler(async(req,res)=>{
         if(like.likedBy.toString() !== req.user?._id){
             throw new ApiError('you are not authorized user to update the like on blog',401);
         }
-
+        
         const updatedLike = await Like.findByIdAndDelete(
             likeId,
         )
@@ -156,7 +156,7 @@ export const deleteLike = asyncHandler(async(req,res)=>{
     }
 })
 
-export const TotalLikesofBlog = asyncHandler(async(req,res)=>{
+ const TotalLikesofBlog = asyncHandler(async(req,res)=>{
     try {
         const {blogId} = req.params;
         if(!isValidObjectId(blogId)){
@@ -180,7 +180,8 @@ export const TotalLikesofBlog = asyncHandler(async(req,res)=>{
         )
     }
 })
-export const TotalLikesofComment = asyncHandler(async(req,res)=>{
+
+ const TotalLikesofComment = asyncHandler(async(req,res)=>{
     try {
         const {commentId} = req.params;
         if(!isValidObjectId(commentId)){
@@ -205,7 +206,7 @@ export const TotalLikesofComment = asyncHandler(async(req,res)=>{
     }
 })
 
-export const TotalLikesofRepliedComment = asyncHandler(async(req,res)=>{
+ const TotalLikesofRepliedComment = asyncHandler(async(req,res)=>{
     try {
         const {replyCommentId} = req.params;
         if(!isValidObjectId(replyCommentId)){
@@ -229,3 +230,13 @@ export const TotalLikesofRepliedComment = asyncHandler(async(req,res)=>{
         )
     }
 })
+
+export {
+    TotalLikesofRepliedComment,
+    TotalLikesofBlog,
+    TotalLikesofComment,
+    deleteLike,
+    userLikeonBlog,
+    userLikeonComment,
+    updateLikeType,
+}

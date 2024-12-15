@@ -18,11 +18,19 @@ app.use(express.static('public'))
 // import routes
 
 import { userRouter } from "./routes/user.route.js";
+import {likeRouter} from "./routes/like.route.js";
+import {blogRouter} from "./routes/blog.route.js";
+import {replyCommentRouter} from "./routes/replyComment.route.js";
+import {commentRouter} from "./routes/comment.route.js"
 
 
 
 
 app.use('/api/v1/users',userRouter);
+app.use('/api/v1/blogs',blogRouter);
+app.use('/api/v1/likes',likeRouter);
+app.use('/api/v1/reply-comments',replyCommentRouter);
+app.use('/api/v1/comments',commentRouter);
 
 
 export {app}
