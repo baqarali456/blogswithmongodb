@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { verifyJWT } from "../middlewares/auth.middleware";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
 import {
     TotalLikesofRepliedComment, TotalLikesofBlog, TotalLikesofComment, deleteLike, userLikeonBlog, userLikeonComment, updateLikeType,
 } from "../controlllers/like.controller.js"
