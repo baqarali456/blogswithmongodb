@@ -8,7 +8,6 @@ import {
     updateComment,
     deleteComment,
     getAllRepliedCommentInMainComment,
-    TotalLikesofComment
     
 } from '../controlllers/comment.controller.js';
 
@@ -26,7 +25,7 @@ commentRouter.route('/delete-comment/:commentId').delete(deleteComment)
 
 commentRouter.route('/getAllCommentsOfBlog/:blogId').get(getAllCommentsOfBlog)
 
-commentRouter.route('/getTotalLikesOfComment/:commentId').get(TotalLikesofComment)
+
 
 commentRouter.route("/getAllRepliedCommentInMainComment/:commentId").get(getAllRepliedCommentInMainComment)
 
