@@ -11,7 +11,7 @@ import {
     
 } from '../controlllers/comment.controller.js';
 
-import { verifyJWT } from "../middleware/auth.middleware.js"
+import { verifyJWT } from "../middlewares/auth.middleware.js"
 
 const commentRouter = Router();
 
