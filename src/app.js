@@ -14,6 +14,10 @@ app.use(express.json({limit:"20kb"}));
 app.use(express.urlencoded({extended:true,limit:'16kb'}));
 app.use(express.static('public'))
 
+app.get('/',(req,res)=>{
+    res.send("Welcome to Blog APP");
+})
+
 
 // import routes
 
