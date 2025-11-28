@@ -8,7 +8,8 @@ import { User } from "../models/user.model.js";
 export const verifyJWT = asyncHandler(async(req,res,next)=>{
    
         try {
-            const token = req.body?.accessToken || req.header('Authorization').slice(7);
+            const token = req.cookies?.accessToken || req.header('Authorization').slice(7);
+
     
             const decodeToken = jwt.verify(token,process.env.ACCESS_TOKEN_SECRET)
     
