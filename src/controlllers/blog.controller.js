@@ -36,6 +36,7 @@ const createBlog = asyncHandler(async (req, res) => {
 const updateBlog = asyncHandler(async (req, res) => {
     try {
         const { blogId } = req.params;
+        console.log(blogId,'blogId');
         const isValidBlogId = isValidObjectId(blogId)
         if (!isValidBlogId) {
             throw new ApiError('blog id is not valid', 401)
