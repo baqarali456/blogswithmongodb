@@ -15,6 +15,7 @@ const createBlog = asyncHandler(async (req, res) => {
         const newblog = await Blog.create({
             title,
             content,
+            createdBy: req.user?._id,
         });
 
         return res
@@ -37,18 +38,20 @@ const updateBlog = asyncHandler(async (req, res) => {
     try {
         const { blogId } = req.params;
         console.log(blogId,'blogId');
-        const isValidBlogId = isValidObjectId(blogId)
+        const isValidBlogId = isValidObjectId(blogId);
+       
         if (!isValidBlogId) {
             throw new ApiError('blog id is not valid', 401)
         }
         const { title, content } = req.body;
+       
 
         if (!title?.trim() || !content?.trim()) {
             throw new ApiError('All fields are required', 401);
         }
 
         const blog = await Blog.findOne({ _id: blogId });
-
+         
         if (blog.createdBy !== req.user?._id) {
             throw new ApiError('you are not authorized user to update the blog');
         }
