@@ -51,6 +51,7 @@ const updateBlog = asyncHandler(async (req, res) => {
         }
 
         const blog = await Blog.findOne({ _id: blogId });
+        console.log(blog,'blog');
          
         if (blog.createdBy !== req.user?._id) {
             throw new ApiError('you are not authorized user to update the blog');
