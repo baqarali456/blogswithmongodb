@@ -136,9 +136,23 @@ const logoutUser = asyncHandler(async (req, res) => {
     )
 })
 
+const getCurrentUser = asyncHandler(async(req,res)=>{
+    try {
+      const user =   await User.findById(req.user._id);
+
+      return res.status(200).json(
+        new ApiResponse(user,'get current user successfully',200)
+      )
+
+    } catch (error) {
+       throw new ApiError(error.message || "something went wrong while getting user",500) 
+    }
+})
+
 
 export { 
     createUser,
     loginUser,
     logoutUser,
+    getCurrentUser,
 }
