@@ -5,7 +5,7 @@ import { User } from "../models/user.model.js";
 import bcrypt from "bcrypt";
 
 const createUser = asyncHandler(async (req, res) => {
-    try {
+    
         const { username, email, password } = req.body;
 
         // Validate EAch fields because each fields are required
@@ -35,13 +35,7 @@ const createUser = asyncHandler(async (req, res) => {
                 new ApiResponse(user, 'user signup successfully', 200)
             )
 
-    } catch (error) {
-        return res
-            .status(500)
-            .json(
-                new ApiResponse({}, error.message, false, 500)
-            )
-    }
+    
 
 
 })
@@ -64,53 +58,45 @@ const generateAccessTokenandRefreshToken = async (userId) => {
 }
 
 const loginUser = asyncHandler(async (req, res) => {
-    try {
-        const { username, email, password } = req.body;
+    const { username, email, password } = req.body;
 
-        if (!username || !email) {
-            throw new ApiError("All fields are required");
-        }
-
-        const user = await User.findOne({
-            $or: [{ username }, { email }]
-        });
-
-        if (!user) {
-            throw new ApiError("user doesn't exist", 404)
-        }
-
-        const isPasswordCorrect = await bcrypt.compare(password, user.password);
-        if (!isPasswordCorrect) {
-            throw new ApiError('password is wrong', 400)
-        }
-
-
-        const { accessToken, refreshToken } = await generateAccessTokenandRefreshToken(user?._id)
-
-        const loggedInuser = await User.findById(user._id).select(
-            "-password -refreshToken"
-        );
-
-        const options = {
-            httpOnly: true,
-            secure: true
-        }
-
-        return res
-            .status(200)
-            .cookie('accessToken', accessToken, options)
-            .cookie('refreshToken', refreshToken, options)
-            .json(
-                new ApiResponse({ loggedInuser, accessToken, refreshToken }, "user login successfully", 200)
-            )
-
-    } catch (error) {
-        return res
-            .status(500)
-            .json(
-                new ApiResponse({}, error.message || "internal server problem", 500)
-            )
+    if (!username || !email) {
+        throw new ApiError("All fields are required");
     }
+
+    const user = await User.findOne({
+        $or: [{ username }, { email }]
+    });
+
+    if (!user) {
+        throw new ApiError("user doesn't exist", 404)
+    }
+
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect) {
+        throw new ApiError('password is wrong', 400)
+    }
+
+
+    const { accessToken, refreshToken } = await generateAccessTokenandRefreshToken(user?._id)
+
+    const loggedInuser = await User.findById(user._id).select(
+        "-password -refreshToken"
+    );
+
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+
+    return res
+        .status(200)
+        .cookie('accessToken', accessToken, options)
+        .cookie('refreshToken', refreshToken, options)
+        .json(
+            new ApiResponse({ loggedInuser, accessToken, refreshToken }, "user login successfully", 200)
+        )
+    
 
 
 
@@ -137,16 +123,11 @@ const logoutUser = asyncHandler(async (req, res) => {
 })
 
 const getCurrentUser = asyncHandler(async(req,res)=>{
-    try {
-      const user =   await User.findById(req.user._id);
+    const user =   await User.findById(req.user._id);
 
-      return res.status(200).json(
-        new ApiResponse(user,'get current user successfully',200)
-      )
-
-    } catch (error) {
-       throw new ApiError(error.message || "something went wrong while getting user",500) 
-    }
+    return res.status(200).json(
+      new ApiResponse(user,'get current user successfully',200)
+    )
 })
 
 
